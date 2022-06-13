@@ -143,12 +143,26 @@ class PMO {
         })
     }
 
-    logout() {
+    logout(preserve) {
         return new Promise((res,rej) => {
-            Axios.get(PMO_API_BASE + '?a=logout').then( r=> {
+            let logoutReq = new FormData();
+            logoutReq.append('preserve',preserve ? true : false);
+            Axios.post(PMO_API_BASE + '?a=logout', logoutReq).then( r=> {
                 res(r.data.api.logged_in);
             }).catch(r=>{
                 rej(r)
+            })
+        })
+    }
+
+    deviceLogin(deviceid) {
+        return new Promise((res,rej) => {
+            let loginReq = new FormData();
+            loginReq.append('deviceid',deviceid);
+            Axios.post(PMO_API_BASE + '?a=device', loginReq).then( r=> {
+                res(r.data);
+            }).catch(r=>{
+                rej(r);
             })
         })
     }
