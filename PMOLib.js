@@ -130,11 +130,12 @@ class PMO {
         })
     }
 
-    loginUser(email,pin) {
+    loginUser(email,pin,remember) {
         return new Promise((res,rej) => {
             let loginReq = new FormData();
             loginReq.append('email',email);
             loginReq.append('pin',pin);
+            loginReq.append('remember',remember ? 1 : 0);
             Axios.post(PMO_API_BASE + '?a=login', loginReq).then( r=> {
                 res(r.data);
             }).catch(r=>{
@@ -146,7 +147,7 @@ class PMO {
     logout(preserve) {
         return new Promise((res,rej) => {
             let logoutReq = new FormData();
-            logoutReq.append('preserve',preserve ? true : false);
+            logoutReq.append('preserve',preserve ? 1 : 0);
             Axios.post(PMO_API_BASE + '?a=logout', logoutReq).then( r=> {
                 res(r.data.api.logged_in);
             }).catch(r=>{
