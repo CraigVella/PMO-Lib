@@ -1,5 +1,6 @@
 import Axios from 'axios'
 Axios.defaults.withCredentials = true;
+import _ from 'lodash';
 
 const PMO_API_BASE = "https://pmorganizer.org/api/"
 
@@ -11,57 +12,77 @@ class DayList {
                 name: "Monday",
                 active: false,
                 dId: 0,
-                locId: 0
+                locId: 0,
+                shifts: []
             },
             {
                 dayNum: 2,
                 name: "Tuesday",
                 active: false,
                 dId: 0,
-                locId: 0
+                locId: 0,
+                shifts: []
             },
             {
                 dayNum: 3,
                 name: "Wednesday",
                 active: false,
                 dId: 0,
-                locId: 0
+                locId: 0,
+                shifts: []
             },
             {
                 dayNum: 4,
                 name: "Thursday",
                 active: false,
                 dId: 0,
-                locId: 0
+                locId: 0,
+                shifts: []
             },
             {
                 dayNum: 5,
                 name: "Friday",
                 active: false,
                 dId: 0,
-                locId: 0
+                locId: 0,
+                shifts: []
             },
             {
                 dayNum: 6,
                 name: "Saturday",
                 active: false,
                 dId: 0,
-                locId: 0
+                locId: 0,
+                shifts: []
             },
             {
                 dayNum: 7,
                 name: "Sunday",
                 active: false,
                 dId: 0,
-                locId: 0
+                locId: 0,
+                shifts: []
             }
         ]
     }
 
-    setDayOfWeek(dayNumber, active, dId, locId) {
+    setDayOfWeek(dayNumber, active, dId, locId, shifts) {
         this.days[dayNumber - 1].active = active;
         this.days[dayNumber - 1].dId = dId;
         this.days[dayNumber - 1].locId = locId;
+        if (shifts) {
+            this.days[dayNumber - 1].shifts = shifts;
+        }
+    }
+
+    getDayOfWeekZeroStart(zeroStartDay) {
+        if (zeroStartDay > 6 || zeroStartDay < 0) {
+            return null;
+        } else if (0 ===  zeroStartDay) {
+            return this.days[6]
+        } else {
+            return this.days[zeroStartDay-1]
+        }
     }
 }
 
@@ -99,6 +120,61 @@ class Shift {
         this.shiftEnd = "2022-01-01T12:00:00+00:00";
         this.shiftStart = "2022-01-01T10:00:00+00:00";
         this.slots = 4;
+    }
+}
+
+class Signups {
+    constructor(slots, haskeyPerson, shiftId) {
+        this.slots = slots;
+        this.hasKeyPerson = haskeyPerson === 'Y' ? true : false;
+        this.shiftId = shiftId;
+        this.slotsLeft = slots;
+        this.keyPersonSlotsLeft = 0;
+        if (this.hasKeyPerson) {
+            this.keyPersonSlotsLeft++;
+            this.slotsLeft--;
+        }
+        this.signups = Array(slots);
+    }
+
+    populate(signupsDataArray) {
+        let signupCopy = [];
+        let currentLocation = 0;
+        if (signupsDataArray.length !== undefined && signupsDataArray.length > 0) {
+            signupCopy = _.cloneDeep(signupsDataArray);
+        }
+        for (let x = 0; x < this.slots; ++x) {
+            this.signups[x] = new Signup();
+        }
+
+        if (this.hasKeyPerson) {
+            // Look for Key Person
+            this.signups[currentLocation].keyPersonSlot = true;
+            for (let y = 0; y < signupCopy.length; ++y) {
+                if (signupCopy[y].keyMan === 'Y') {
+                    this.keyPersonSlotsLeft--;
+                    this.signups[currentLocation].signupObject = _.cloneDeep(signupCopy[y]);
+                    signupCopy.splice(y,1);
+                    break;
+                }
+            }
+            currentLocation++;
+        }
+
+        signupCopy.forEach(element => {
+            this.signups[currentLocation].populated = true;
+            this.signups[currentLocation].signupObject = _.cloneDeep(element)
+            this.slotsLeft--;
+            currentLocation++;
+        });
+    }
+}
+
+class Signup {
+    constructor() {
+        this.signupObject = {};
+        this.populated = false;
+        this.keyPersonSlot = false;
     }
 }
 
@@ -499,4 +575,4 @@ class PMO {
     }
 }
 
-export default {PMO, Publisher, DayList, Location, Shift};
+export default {PMO, Publisher, DayList, Location, Shift, Signups};
