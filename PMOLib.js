@@ -153,6 +153,7 @@ class Signups {
             for (let y = 0; y < signupCopy.length; ++y) {
                 if (signupCopy[y].keyMan === 'Y') {
                     this.keyPersonSlotsLeft--;
+                    this.signups[currentLocation].populated = true;
                     this.signups[currentLocation].signupObject = _.cloneDeep(signupCopy[y]);
                     signupCopy.splice(y,1);
                     break;
