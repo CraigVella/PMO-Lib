@@ -564,6 +564,23 @@ class PMO {
         })
     }
 
+    updateProfile(firstName, lastName, email, phone, pin) {
+        return new Promise((res, rej) => {
+            let req = new FormData();
+            req.append('action','UPDATEPROFILE');
+            req.append('firstname', firstName);
+            req.append('lastname', lastName);
+            req.append('email', email);
+            req.append('phone', phone);
+            req.append('pin', pin);
+            Axios.post(PMO_API_BASE + this._a,req).then( r=> {
+                res(r.data);
+            }).catch(r=>{
+                rej(r);
+            })
+        })
+    }
+
     // Helper funcs
     generalError(vue, message) {
         vue.$buefy.dialog.alert({
