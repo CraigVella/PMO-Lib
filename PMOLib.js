@@ -507,6 +507,20 @@ class PMO {
         })
     }
 
+    getWeatherForZip(zip, date) {
+        return new Promise((res,rej) => {
+            let req = new FormData();
+            req.append('action','WEATHERFORZIP');
+            req.append('zip',zip);
+            req.append('date',date);
+            Axios.post(PMO_API_BASE + this._a,req).then( r=> {
+                res(r.data);
+            }).catch(r=>{
+                rej(r);
+            })
+        })
+    }
+
     getSignupsForShift(shiftId, date) {
         return new Promise((res, rej) => {
             let req = new FormData();
