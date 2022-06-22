@@ -259,6 +259,19 @@ class PMO {
         })
     }
 
+    deletePublisher(pid) {
+        return new Promise((res,rej) => {
+            let req = new FormData();
+            req.append('action','DELETEPUBLISHER');
+            req.append('pid',pid);
+            Axios.post(PMO_API_BASE + this._a,req).then( r=> {
+                res(r.data);
+            }).catch(r=>{
+                rej(r);
+            });
+        })
+    }
+
     createPublisher(firstName, lastName, email, phone, keyPerson, pin, congAdmin, disabled) {
         return new Promise((res,rej) => {
             let req = new FormData();
